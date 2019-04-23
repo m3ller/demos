@@ -17,8 +17,9 @@ import re
 import unittest
 
 from dimod import BinaryQuadraticModel
+from dwave.system.samplers import DWaveSampler
+from dwave.system.composites import EmbeddingComposite
 from maze import Maze, get_label, get_maze_bqm
-from neal import SimulatedAnnealingSampler
 
 
 def fill_with_zeros(solution_dict, n_rows, n_cols, ignore_list=None):
@@ -283,7 +284,7 @@ class TestMazeSolverResponse(unittest.TestCase):
         bqm = maze.get_bqm()
 
         # Sample and test that a response is given
-        sampler = SimulatedAnnealingSampler()
+        sampler = EmbeddingComposite(DWaveSampler(solver={"qpu": True}))
         response = sampler.sample(bqm, num_reads=1000)
         response_sample = next(response.samples())
         self.assertGreaterEqual(len(response), 1)
