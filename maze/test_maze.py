@@ -17,8 +17,11 @@ import re
 import unittest
 
 from dimod import BinaryQuadraticModel
+from dwave.system.testing import MockDWaveSampler
 from dwave.system.samplers import DWaveSampler
 from dwave.system.composites import EmbeddingComposite
+from unittest import mock
+
 from maze import Maze, get_label, get_maze_bqm
 
 
@@ -271,9 +274,15 @@ class TestMazeSolverResponse(unittest.TestCase):
 
         self.assertGreater(energy_no_path, energy_shortest_path0)
 
-    def test_maze_heuristic_response(self):
+    @mock.patch('dwave.system.composites.EmbeddingComposite')
+    @mock.patch('dwave.system.samplers.DWaveSampler', autospec=True)
+    def test_maze_heuristic_response(self, mock_sampler, mock_composite):
         """Small and simple maze to verify that it is possible get a solution.
         """
+        # Set up mocks
+        mock_sampler = MockDWaveSampler
+        mock_composite = lambda x: x
+
         # Create maze
         n_rows = 3
         n_cols = 3
