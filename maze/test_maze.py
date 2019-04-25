@@ -274,15 +274,9 @@ class TestMazeSolverResponse(unittest.TestCase):
 
         self.assertGreater(energy_no_path, energy_shortest_path0)
 
-    @mock.patch('dwave.system.composites.EmbeddingComposite')
-    @mock.patch('dwave.system.samplers.DWaveSampler', autospec=True)
-    def test_maze_heuristic_response(self, mock_sampler, mock_composite):
+    def test_maze_heuristic_response(self):
         """Small and simple maze to verify that it is possible get a solution.
         """
-        # Set up mocks
-        mock_sampler = MockDWaveSampler
-        mock_composite = lambda x: x
-
         # Create maze
         n_rows = 3
         n_cols = 3
@@ -292,16 +286,18 @@ class TestMazeSolverResponse(unittest.TestCase):
         maze = Maze(n_rows, n_cols, start, end, walls)
         bqm = maze.get_bqm()
 
-        # Sample and test that a response is given
-        sampler = EmbeddingComposite(DWaveSampler(solver={"qpu": True}))
-        response = sampler.sample(bqm, num_reads=1000)
-        response_sample = next(response.samples())
-        self.assertGreaterEqual(len(response), 1)
+        with mock.patch('dwave.system.composites.EmbeddingComposite', lambda x: x):
+            with mock.patch('dwave.system.samplers.DWaveSampler', MockDWaveSampler):
+                # Sample and test that a response is given
+                sampler = EmbeddingComposite(DWaveSampler(solver={"qpu": True}))
+                response = sampler.sample(bqm, num_reads=1000)
+                response_sample = next(response.samples())
+                self.assertGreaterEqual(len(response), 1)
 
-        # Test heuristic response
-        expected_solution = {'0,1w': 1, '1,1n': 1, '1,1w': 1, '2,0n': 1, '2,1w': 1, '2,2w': 1}
-        fill_with_zeros(expected_solution, n_rows, n_cols, [start, end])
-        self.compare(response_sample, expected_solution)
+                # Test heuristic response
+                expected_solution = {'0,1w': 1, '1,1n': 1, '1,1w': 1, '2,0n': 1, '2,1w': 1, '2,2w': 1}
+                fill_with_zeros(expected_solution, n_rows, n_cols, [start, end])
+                self.compare(response_sample, expected_solution)
 
 
 class TestGetMazeBqm(unittest.TestCase):
