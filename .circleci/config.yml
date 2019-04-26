@@ -126,7 +126,7 @@ jobs:
       # Restore cache
       - run: *set-requirements-summary-template
       - restore_cache:
-          key: v1-dependencies-{{ checksum "temp_requirements_summary.txt" }}-{{ .Environment.CIRCLE_JOB }}
+          key: v2-dependencies-{{ checksum "temp_requirements_summary.txt" }}-{{ .Environment.CIRCLE_JOB }}
       - run:
           name: Install dependences for macOS
           command: |
