@@ -136,6 +136,7 @@ jobs:
             for demo in !($IGNORED_DIRS); do
               if [ -d "$demo" ]; then
                 (
+                  eval "$(pyenv init -)"
                   pyenv local $PYTHON
 
                   env="envs/$demo"
