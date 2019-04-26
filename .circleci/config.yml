@@ -131,12 +131,13 @@ jobs:
           name: Install dependences for macOS
           command: |
             shopt -s extglob
-            pyenv local $PYTHON
 
             # Looping through demos
             for demo in !($IGNORED_DIRS); do
               if [ -d "$demo" ]; then
                 (
+                  pyenv local $PYTHON
+
                   env="envs/$demo"
                   python -m virtualenv "$env"
                   . "$env/bin/activate"
