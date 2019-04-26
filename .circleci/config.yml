@@ -45,7 +45,8 @@ jobs:
               if [ -d "$demo" ]; then
                 (
                   env="envs/$demo"
-                  virtualenv "$env"
+                  pyenv local $PYTHON
+                  python -m virtualenv "$env"
                   . "$env/bin/activate"
 
                   pip install -r "$demo/requirements.txt"
