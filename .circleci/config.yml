@@ -35,7 +35,7 @@ jobs:
             done
       - restore_cache:
           key: v2-dependencies-{{ checksum "temp_requirements_summary.txt" }}-{{ .Environment.CIRCLE_JOB }}
-      - run:
+      - run: &install-dependences-template
           name: Install dependences
           command: |
             shopt -s extglob
@@ -44,6 +44,15 @@ jobs:
             for demo in !($IGNORED_DIRS); do
               if [ -d "$demo" ]; then
                 (
+
+                  # Call pyenv if we are using MacOS
+                  os="$(uname -a)"
+                  if [ "$os" == "Darwin" ]; then
+                    eval "$(pyenv init -)"
+                    pyenv local $PYTHON
+                  fi
+
+                  # Create demo specific virtual environments
                   env="envs/$demo"
                   python -m virtualenv "$env"
                   . "$env/bin/activate"
@@ -127,27 +136,7 @@ jobs:
       - run: *set-requirements-summary-template
       - restore_cache:
           key: v2-dependencies-{{ checksum "temp_requirements_summary.txt" }}-{{ .Environment.CIRCLE_JOB }}
-      - run:
-          name: Install dependences for macOS
-          command: |
-            shopt -s extglob
-
-            # Looping through demos
-            for demo in !($IGNORED_DIRS); do
-              if [ -d "$demo" ]; then
-                (
-                  eval "$(pyenv init -)"
-                  pyenv local $PYTHON
-
-                  env="envs/$demo"
-                  python -m virtualenv "$env"
-                  . "$env/bin/activate"
-
-                  pip install -r "$demo/requirements.txt"
-                  pip install coverage
-                )
-              fi
-            done
+      - run: *install-dependences-template
       - save_cache:
           key: v1-dependencies-{{ checksum "temp_requirements_summary.txt" }}-{{ .Environment.CIRCLE_JOB }}
           paths:
