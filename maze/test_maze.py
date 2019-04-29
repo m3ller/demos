@@ -20,7 +20,11 @@ import unittest
 
 from dimod import BinaryQuadraticModel
 from dwave.system.testing import MockDWaveSampler
-from unittest import mock
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 from maze import Maze, get_label, get_maze_bqm
 
