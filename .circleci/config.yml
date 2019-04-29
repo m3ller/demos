@@ -59,6 +59,11 @@ jobs:
 
                   pip install -r "$demo/requirements.txt"
                   pip install coverage
+
+                  # Python 2.7 case
+                  if [[ "$PYTHON" =~ ^2\.7\.[0-9]+$ ]]; then
+                    pip install mock
+                  fi
                 )
               fi
             done
