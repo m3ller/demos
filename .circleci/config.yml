@@ -61,7 +61,9 @@ jobs:
                   pip install coverage
 
                   # Python 2.7 case
-                  if [[ "$PYTHON" =~ ^2\.7\.[0-9]+$ ]]; then
+                  # Note: using 2>&1 because python 2.7 sends version info to stderr
+                  python_version="$(python --version 2>&1)"
+                  if [[ "$python_version" =~ ^Python\ 2\.7\.[0-9]+$ ]]; then
                     pip install mock
                   fi
                 )
